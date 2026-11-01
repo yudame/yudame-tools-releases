@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<title>Yudame Tools: connecting Slack</title>
+<body style="font: 15px -apple-system, sans-serif; margin: 48px">
+<p id="text">Handing Slack's answer to Yudame Tools on this Mac…</p>
+<script>
+// Slack redirects here (an HTTPS address it accepts for a distributed app).
+// The app on this Mac put its loopback port at the front of `state`
+// ("53682.<random>"); this page passes Slack's whole answer on to it.
+// The code is useless without the PKCE verifier only the app holds, and the
+// app checks the state. Nothing is sent anywhere else.
+(function () {
+  var query = location.search;
+  var state = new URLSearchParams(query).get("state") || "";
+  var port = parseInt(state.split(".")[0], 10);
+  if (!(port >= 1024 && port <= 65535)) {
+    document.getElementById("text").textContent =
+      "This page only works when Yudame Tools opens it to connect Slack. Go back to Yudame Tools and try again.";
+    return;
+  }
+  location.replace("http://localhost:" + port + "/slack/callback" + query);
+})();
+</script>
+</body>
+</html>
